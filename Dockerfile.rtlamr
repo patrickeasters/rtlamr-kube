@@ -1,0 +1,11 @@
+FROM golang:1.22
+
+RUN go install github.com/bemasher/rtlamr@latest && \
+    go install github.com/ixoo/rtlamr-prometheus@latest
+
+FROM registry.access.redhat.com/ubi9/ubi-minimal
+
+COPY --from=0 /go/bin/rtlamr /usr/local/bin/rtlamr
+COPY --from=0 /go/bin/rtlamr-prometheus /usr/local/bin/rtlamr-prometheus
+
+CMD ["/bin/sh", "-c", "rtlamr -format=json | rtlamr-prometheus"]
